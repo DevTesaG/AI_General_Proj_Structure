@@ -57,7 +57,7 @@ class UnetTrainer:
 
             self.metric.reset_states()
 
-        save_path = os.path.join(self.model_save_path, "unet/1/")
+        save_path = os.path.join(self.model_save_path, "unet")
         tf.saved_model.save(self.model, save_path)
 
     def train_distributed(self):
