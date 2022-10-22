@@ -7,6 +7,8 @@
 from .base_model import BaseModel
 from utils.logger import get_logger
 from data.dataloader import DataLoader
+from executor.unet_trainer import UnetTrainer
+
 # external
 import tensorflow as tf
 from tensorflow_examples.models.pix2pix import pix2pix
@@ -102,9 +104,17 @@ class UNet(BaseModel):
 
     def train(self):
         """Compiles and trains the model"""
-        self.model.compile(optimizer=self.config.train.optimizer.type,
-                           loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
-                           metrics=self.config.train.metrics)
+        # self.model.compile(optimizer=self.config.train.optimizer.type,
+        #                    loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
+        #                    metrics=self.config.train.metrics)
+
+        optimizer = tf.keras.optimizers.Adam()
+        loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
+        metrics = tf.keras.metrics.SparseCategoricalAccuracy()
+
+        # trainer = UnetTrainer(self.model, self.train_dataset, loss, optimizer, metrics, self.epoches)
+        trainer = UnetTrainer(self.model, self.train_dataset, loss, self.config.train.optimizer.type, metrics, self.epoches)
+        trainer.train()
 
         LOG.info('Training started')
 
