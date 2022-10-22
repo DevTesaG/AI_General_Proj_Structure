@@ -40,64 +40,17 @@ class UNet(BaseModel):
 
     def load_data(self):
         """Loads and Preprocess data """
-        LOG.info(f'Loading {self.config.data.path} dataset...' )
+        LOG.info(f'Loading {self.config.data.path} dataset...')
         self.dataset, self.info = DataLoader().load_data(self.config.data)
-        self._preprocess_data()
-
-    def _preprocess_data(self):
-        LOG.info('Splitting and shuffling dataset...')
-        """ Splits into training and test and set training parameters"""
-        train = self.dataset['train'].map(self._load_image_train, num_parallel_calls=tf.data.experimental.AUTOTUNE)
-        test = self.dataset['test'].map(self._load_image_test)
-
-        self.train_dataset = train.cache().shuffle(self.buffer_size).batch(self.batch_size).repeat()
-        self.train_dataset = self.train_dataset.prefetch(buffer_size=tf.data.experimental.AUTOTUNE)
-        self.test_dataset = test.batch(self.batch_size)
-
+        self.train_dataset, self.test_dataset = DataLoader.preprocess_data(self.dataset, self.batch_size, self.buffer_size, self.image_size)
         self._set_training_parameters()
+
 
     def _set_training_parameters(self):
         """Sets training parameters"""
         self.train_length = self.info.splits['train'].num_examples
         self.steps_per_epoch = self.train_length // self.batch_size
         self.validation_steps = self.info.splits['test'].num_examples // self.batch_size // self.val_subsplits
-
-    def _normalize(self, input_image, input_mask):
-        """ Normalise input image
-        Args:
-            input_image (tf.image): The input image
-            input_mask (int): The image mask
-        Returns:
-            input_image (tf.image): The normalized input image
-            input_mask (int): The new image mask
-        """
-        input_image = tf.cast(input_image, tf.float32) / 255.0
-        input_mask -= 1
-        return input_image, input_mask
-
-    @tf.function
-    def _load_image_train(self, datapoint):
-        """ Loads and preprocess  a single training image """
-        input_image = tf.image.resize(datapoint['image'], (self.image_size, self.image_size))
-        input_mask = tf.image.resize(datapoint['segmentation_mask'], (self.image_size, self.image_size))
-
-        if tf.random.uniform(()) > 0.5:
-            input_image = tf.image.flip_left_right(input_image)
-            input_mask = tf.image.flip_left_right(input_mask)
-
-        input_image, input_mask = self._normalize(input_image, input_mask)
-
-        return input_image, input_mask
-
-    def _load_image_test(self, datapoint):
-        """ Loads and preprocess a single test images"""
-
-        input_image = tf.image.resize(datapoint['image'], (self.image_size, self.image_size))
-        input_mask = tf.image.resize(datapoint['segmentation_mask'], (self.image_size, self.image_size))
-
-        input_image, input_mask = self._normalize(input_image, input_mask)
-
-        return input_image, input_mask
 
     def build(self):
         """ Builds the Keras model based """

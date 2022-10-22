@@ -55,3 +55,7 @@ class Tester(tf.test.TestCase):
 
         self.assertItemsEqual(self.unet.train_dataset.element_spec[0].shape, shape)
         self.assertItemsEqual(self.unet.test_dataset.element_spec[0].shape, shape)
+
+
+if __name__ == '__main__':
+    tf.test.main()
