@@ -17,11 +17,12 @@ class DataLoader:
     @staticmethod
     def preprocess_data(dataset, batch_size, buffer_size,image_size):
         """ Preprocess and splits into training and test"""
-        train = dataset['train'].map(lambda image: DataLoader._preprocess_train(image,image_size), num_parallel_calls=tf.data.experimental.AUTOTUNE)
-        train_dataset = train.shuffle(buffer_size)
-
+        train = dataset['train'].map(lambda image: DataLoader._preprocess_train(image, image_size), num_parallel_calls=tf.data.experimental.AUTOTUNE)
         test = dataset['test'].map(lambda image: DataLoader._preprocess_test(image, image_size))
-        test_dataset = test.shuffle(buffer_size)
+
+        train_dataset = train.shuffle(buffer_size).batch(batch_size).cache().repeat()
+        train_dataset = train_dataset.prefetch(buffer_size=tf.data.experimental.AUTOTUNE)
+        test_dataset = test.batch(batch_size)
 
         return train_dataset, test_dataset
 
