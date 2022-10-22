@@ -1,7 +1,7 @@
 import tensorflow as tf
 import numpy as np
 
-from configs.config import CFG
+from config import CFG
 from utils.config import Config
 from utils.plotter import display
 
