@@ -4,6 +4,8 @@
 # standard library
 
 # internal
+import json
+import os
 from .base_model import BaseModel
 from utils.logger import get_logger
 from data.dataloader import DataLoader
@@ -107,6 +109,7 @@ class UNet(BaseModel):
         # self.model.compile(optimizer=self.config.train.optimizer.type,
         #                    loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
         #                    metrics=self.config.train.metrics)
+        LOG.info('Training started')
 
         optimizer = tf.keras.optimizers.Adam()
         loss = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
@@ -115,15 +118,6 @@ class UNet(BaseModel):
         # trainer = UnetTrainer(self.model, self.train_dataset, loss, optimizer, metrics, self.epoches)
         trainer = UnetTrainer(self.model, self.train_dataset, loss, self.config.train.optimizer.type, metrics, self.epoches)
         trainer.train()
-
-        LOG.info('Training started')
-
-        model_history = self.model.fit(self.train_dataset, epochs=self.epoches,
-                                       steps_per_epoch=self.steps_per_epoch,
-                                       validation_steps=self.validation_steps,
-                                       validation_data=self.test_dataset)
-
-        return model_history.history['loss'], model_history.history['val_loss']
 
     def evaluate(self):
         """Predicts resuts for the test dataset"""
@@ -135,13 +129,24 @@ class UNet(BaseModel):
 
         return predictions
 
-
     def distributed_train(self):
+        inputs = tf.keras.layers.Input(shape=self.config.model.input)
+        x = inputs
+
+        #Strategies
+        central_storage_strategy = tf.distribute.experimental.CentralStorageStrategy()
+
         mirrored_strategy = tf.distribute.MirroredStrategy(devices=["/gpu:0", "/gpu:1"])
         with mirrored_strategy.scope():
             self.model = tf.keras.Model(inputs=inputs, outputs=x)
-            self.model.compile(...)
-            self.model.fit(...)
+            self.model.compile(optimizer=self.config.train.optimizer.type,
+                        loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
+                        metrics=self.config.train.metrics)
+
+            model_history = self.model.fit(self.train_dataset, epochs=self.epoches,
+                                        steps_per_epoch=self.steps_per_epoch,
+                                        validation_steps=self.validation_steps,
+                                        validation_data=self.test_dataset)
 
 
         os.environ["TF_CONFIG"] = json.dumps(
@@ -159,8 +164,14 @@ class UNet(BaseModel):
         multi_worker_mirrored_strategy = tf.distribute.experimental.MultiWorkerMirroredStrategy()
         with multi_worker_mirrored_strategy.scope():
             self.model = tf.keras.Model(inputs=inputs, outputs=x)
-            self.model.compile(...)
-            self.model.fit(...)
+            self.model.compile(optimizer=self.config.train.optimizer.type,
+                        loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
+                        metrics=self.config.train.metrics)
+
+            model_history = self.model.fit(self.train_dataset, epochs=self.epoches,
+                                        steps_per_epoch=self.steps_per_epoch,
+                                        validation_steps=self.validation_steps,
+                                        validation_data=self.test_dataset)
 
         parameter_server_strategy = tf.distribute.experimental.ParameterServerStrategy()
 
@@ -176,3 +187,7 @@ class UNet(BaseModel):
                 }
             }
         )
+
+        #Async strategies
+        ps_strategy = tf.distribute.experimental.ParameterServerStrategy()
+        parameter_server_strategy = tf.distribute.experimental.ParameterServerStrategy()

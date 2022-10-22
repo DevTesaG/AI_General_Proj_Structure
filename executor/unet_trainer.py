@@ -60,7 +60,20 @@ class UnetTrainer:
         save_path = os.path.join(self.model_save_path, "unet/1/")
         tf.saved_model.save(self.model, save_path)
 
-    
+    def train_distributed(self):
+        """Compiles and trains the model"""
+        self.model.compile(optimizer=self.config.train.optimizer.type,
+                        loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
+                        metrics=self.config.train.metrics)
+
+        model_history = self.model.fit(self.train_dataset, epochs=self.epoches,
+                                        steps_per_epoch=self.steps_per_epoch,
+                                        validation_steps=self.validation_steps,
+                                        validation_data=self.test_dataset)
+
+        return model_history.history['loss'], model_history.history['val_loss']
+
+
     def _write_summary(self, loss, epoch):
         with self.train_summary_writer.as_default():
             tf.summary.scalar('loss', loss, step=epoch)
