@@ -12,6 +12,7 @@ jobs:
       - uses: actions/checkout@v2 # This actions copy the repository on the environment
       - name: Rename the heroku_python.yml
         run: |
+          cd docker
           ls -a
           mv heroku_server.yml heroku.yml
           ls -a
@@ -28,6 +29,7 @@ jobs:
       - uses: actions/checkout@v2 # This actions copy the repository on the environment
       - name: Rename the heroku_angular.yml
         run: |
+          cd docker
           ls -a
           mv heroku_server.yml heroku.yml
           ls -a
