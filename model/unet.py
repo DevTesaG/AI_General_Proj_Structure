@@ -94,9 +94,7 @@ class UNet(BaseModel):
             x = concat([x, skip])
 
         # This is the last layer of the model
-        last = tf.keras.layers.Conv2DTranspose(
-            self.output_channels, self.config.model.up_stack.kernels, strides=2,
-            padding='same')  # 64x64 -> 128x128
+        last = tf.keras.layers.Conv2DTranspose(self.output_channels, self.config.model.up_stack.kernels, strides=2, padding='same')  # 64x64 -> 128x128
 
         x = last(x)
 
