@@ -39,4 +39,4 @@ class UnetInferrer:
         # pred = self.predict(tensor_image)['conv2d_transpose_4']
         # display([tensor_image[0], pred[0]])
         # pred = pred.numpy().tolist()
-        return { "This image most likely belongs to {} with a {:.2f} percent confidence.".format(self.class_names[np.argmax(score_lite)], 100 * np.max(score_lite))}
+        return "This image most likely belongs to {} with a {:.2f} percent confidence.".format(self.class_names[np.argmax(score_lite)], 100 * np.max(score_lite))
