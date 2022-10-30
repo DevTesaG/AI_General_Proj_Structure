@@ -32,4 +32,4 @@ def handle_exception(e):
 
 
 if __name__ == '__main__':
-    app.run(threaded=True, port=PORT_NUMBER)
+    app.run(threaded=True)
