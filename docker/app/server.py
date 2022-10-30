@@ -29,5 +29,6 @@ def handle_exception(e):
 
 
 if __name__ == '__main__':
+    HOST = "0.0.0.0"
     PORT = int(os.environ.get('PORT', 5000))
     app.run(threaded=True, host = HOST, port= PORT)
