@@ -10,33 +10,13 @@ jobs:
     runs-on: ubuntu-latest # Setup an environment to run the action
     steps:
       - uses: actions/checkout@v2 # This actions copy the repository on the environment
-      - name: Rename the heroku_python.yml
+      - name: Deploys dockerfiles to heroku
         run: |
           cd docker
-          ls -a
-          mv heroku_server.yml heroku.yml
-          ls -a
       - uses: akhileshns/heroku-deploy@v3.12.12 # This action deploys the content on Heroku
         with:
           heroku_api_key: ${{secrets.HEROKU_API_KEY}} #The Heroku api key we stored on our repo secret
           heroku_app_name: "ml-gen-struct" #The name of your heroku app - Must be unique in Heroku
           heroku_email: "feynman.stories@gmail.com" #Your heroku yuser name
           stack: "container"
-  
-  app-build:
-    needs: server-build
-    runs-on: ubuntu-latest # Setup an environment to run the action
-    steps:
-      - uses: actions/checkout@v2 # This actions copy the repository on the environment
-      - name: Rename the heroku_angular.yml
-        run: |
-          cd docker
-          ls -a
-          mv heroku_server.yml heroku.yml
-          ls -a
-      - uses: akhileshns/heroku-deploy@v3.12.12 # This action deploys the content on Heroku
-        with:
-          heroku_api_key: ${{secrets.HEROKU_API_KEY}} #The Heroku api key we stored on our repo secret
-          heroku_app_name: "ml-gen-struct" #The name of your heroku app - Must be unique in Heroku
-          heroku_email: "feynman.stories@gmail.com" #Your heroku yuser name
-          stack: "container"
+          usedocker: true
