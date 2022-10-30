@@ -2,8 +2,8 @@ import tensorflow as tf
 import numpy as np
 
 from config import CFG
-from utils.config import Config
 from utils.plotter import display
+from config import Config
 
 
 class UnetInferrer:
