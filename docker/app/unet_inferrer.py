@@ -10,17 +10,16 @@ class UnetInferrer:
         self.image_size = 180
         self.class_names = ['daisy', 'dandelion', 'roses', 'sunflowers', 'tulips']
         self.TF_MODEL_FILE_PATH = 'unet/model.tflite'
-        self.model = tf.saved_model.load(self.saved_path)
-        self.classify_lite = None
+        self.classify_lite = self.loadModel()
         # print(list(    self.model.signatures.keys()))
 
-        self.predict = self.model.signatures["serving_default"]
-        # print(self.predict.structured_outputs)
+        # self.predict = self.model.signatures["serving_default"]
+        # print(self.predict.structured_output  s)
 
     def loadModel(self):
         interpreter = tf.lite.Interpreter(model_path=self.TF_MODEL_FILE_PATH)
         interpreter.get_signature_list()
-        self.classify_lite = interpreter.get_signature_runner('serving_default')
+        return interpreter.get_signature_runner('serving_default')
         
 
     def preprocess(self, image):
