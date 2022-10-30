@@ -7,15 +7,21 @@ import numpy as np
 
 class UnetInferrer:
     def __init__(self):
-        self.image_size = 128
-
-        self.saved_path = 'unet'
+        self.image_size = 180
+        self.class_names = ['daisy', 'dandelion', 'roses', 'sunflowers', 'tulips']
+        self.TF_MODEL_FILE_PATH = 'unet/model.tflite'
         self.model = tf.saved_model.load(self.saved_path)
-
+        self.classify_lite = None
         # print(list(    self.model.signatures.keys()))
 
         self.predict = self.model.signatures["serving_default"]
         # print(self.predict.structured_outputs)
+
+    def loadModel(self):
+        interpreter = tf.lite.Interpreter(model_path=self.TF_MODEL_FILE_PATH)
+        interpreter.get_signature_list()
+        self.classify_lite = interpreter.get_signature_runner('serving_default')
+        
 
     def preprocess(self, image):
         image = tf.image.resize(image, (self.image_size, self.image_size))
@@ -27,7 +33,11 @@ class UnetInferrer:
         shape= tensor_image.shape
         tensor_image = tf.reshape(tensor_image,[1, shape[0],shape[1], shape[2]])
         # print(tensor_image.shape)
-        pred = self.predict(tensor_image)['conv2d_transpose_4']
+        self.loadModel()
+        predictions_lite = self.classify_lite(sequential_2_input=tensor_image)['outputs']
+        score_lite = tf.nn.softmax(predictions_lite)
+
+        # pred = self.predict(tensor_image)['conv2d_transpose_4']
         # display([tensor_image[0], pred[0]])
-        pred = pred.numpy().tolist()
-        return {'segmentation_output':pred}
+        # pred = pred.numpy().tolist()
+        return { "This image most likely belongs to {} with a {:.2f} percent confidence.".format(self.class_names[np.argmax(score_lite)], 100 * np.max(score_lite))}
