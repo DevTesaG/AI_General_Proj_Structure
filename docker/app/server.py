@@ -8,9 +8,6 @@ from unet_inferrer import UnetInferrer
 
 app = Flask(__name__)
 
-APP_ROOT = os.getenv('APP_ROOT', '/infer')
-HOST = "0.0.0.0"
-PORT_NUMBER = int(os.getenv('PORT_NUMBER', 8080))
 
 u_net = UnetInferrer()
 
@@ -32,4 +29,5 @@ def handle_exception(e):
 
 
 if __name__ == '__main__':
-    app.run(threaded=True, host = HOST)
+    PORT = int(os.environ.get('PORT', 5000))
+    app.run(threaded=True, host = HOST, port= PORT)
