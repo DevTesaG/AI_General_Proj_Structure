@@ -14,12 +14,16 @@ PORT_NUMBER = int(os.getenv('PORT_NUMBER', 8080))
 u_net = UnetInferrer()
 
 
-@app.route(APP_ROOT, methods=["POST"])
+@app.route('/infer/', methods=["POST"])
 def infer():
     data = request.json
     image = data['image']
     return u_net.infer(image)
 
+# A welcome message to test our server
+@app.route('/')
+def index():
+    return "<h1>Welcome to our ML test page !!</h1>"
 
 @app.errorhandler(Exception)
 def handle_exception(e):
@@ -27,4 +31,4 @@ def handle_exception(e):
 
 
 if __name__ == '__main__':
-    app.run(host=HOST, port=PORT_NUMBER)
+    app.run(port=PORT_NUMBER)

@@ -2,10 +2,10 @@ import requests
 from PIL import Image
 import numpy as np
 
-ENDPOINT_URL = "http://0.0.0.0:8080/infer"
+ENDPOINT_URL = "https://ml-gen-struct.herokuapp.com/infer"
 
 def infer():
-    image = np.asarray(Image.open('assets/yorkshire_terrier.jpg')).astype(np.float32)
+    image = np.asarray(Image.open('assets/poodle.jpg')).astype(np.float32)
     data = { 'image': image.tolist() }
     response = requests.post(ENDPOINT_URL, json = data)
     response.raise_for_status()
