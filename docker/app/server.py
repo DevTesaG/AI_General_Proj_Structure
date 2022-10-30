@@ -12,7 +12,7 @@ app = Flask(__name__)
 u_net = UnetInferrer()
 
 
-@app.route('/infer/', methods=["POST"])
+@app.route('/infer', methods=["POST"])
 def infer():
     data = request.json
     image = data['image']
