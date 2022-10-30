@@ -1,15 +1,13 @@
 import tensorflow as tf
 import numpy as np
 
-from config import CFG
 # from utils.plotter import display
-from config import Config
+
 
 
 class UnetInferrer:
     def __init__(self):
-        self.config = Config.from_json(CFG)
-        self.image_size = self.config.data.image_size
+        self.image_size = 128
 
         self.saved_path = 'unet'
         self.model = tf.saved_model.load(self.saved_path)
