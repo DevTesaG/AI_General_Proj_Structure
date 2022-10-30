@@ -2,7 +2,7 @@ import tensorflow as tf
 import numpy as np
 
 from config import CFG
-from utils.plotter import display
+# from utils.plotter import display
 from config import Config
 
 
@@ -28,8 +28,8 @@ class UnetInferrer:
         tensor_image = self.preprocess(tensor_image)
         shape= tensor_image.shape
         tensor_image = tf.reshape(tensor_image,[1, shape[0],shape[1], shape[2]])
-        print(tensor_image.shape)
+        # print(tensor_image.shape)
         pred = self.predict(tensor_image)['conv2d_transpose_4']
-        display([tensor_image[0], pred[0]])
+        # display([tensor_image[0], pred[0]])
         pred = pred.numpy().tolist()
         return {'segmentation_output':pred}

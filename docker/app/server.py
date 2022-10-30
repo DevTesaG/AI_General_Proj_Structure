@@ -1,4 +1,5 @@
 import os
+from pickle import TRUE
 import traceback
 
 from flask import Flask, jsonify, request
@@ -31,4 +32,4 @@ def handle_exception(e):
 
 
 if __name__ == '__main__':
-    app.run(port=PORT_NUMBER)
+    app.run(threaded=True, port=PORT_NUMBER)
