@@ -16,7 +16,8 @@ u_net = UnetInferrer()
 def infer():
     data = request.json
     image = data['image']
-    return u_net.infer(image)
+    response = u_net.infer(image) 
+    return jsonify(response)
 
 # A welcome message to test our server
 @app.route('/')
