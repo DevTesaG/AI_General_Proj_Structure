@@ -38,7 +38,7 @@ jobs:
 
           # (Optional, default: "Dockerfile")
           # Dockerfile name.
-          dockerfile_name: Dockerfile
+          dockerfile_name: DOCKERFILE
 
           # (Optional, default: "")
           # Additional options of docker build command.
